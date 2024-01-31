@@ -11,7 +11,7 @@ const state = {
   ...STYLE_CONFIG,
   showSettingPanel: false,
   colorList: {},
-  chartColors: LIGHT_CHART_COLORS,
+  chartColors: { ...LIGHT_CHART_COLORS },
 };
 
 export type TState = typeof state;
