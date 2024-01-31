@@ -3,7 +3,6 @@ import trim from 'lodash/trim';
 import { Color } from 'tvision-color';
 
 import { TColorToken } from '@/config/color';
-
 /**
  * 依据主题类型获取颜色
  *
@@ -13,6 +12,7 @@ import { TColorToken } from '@/config/color';
  */
 export function getColorFromTheme(): Array<string> {
   const theme = trim(getComputedStyle(document.documentElement).getPropertyValue('--td-brand-color'));
+
   const themeColorList = Color.getRandomPalette({
     color: theme,
     colorGamut: 'bright',
@@ -27,6 +27,29 @@ export function getChartListColor(): Array<string> {
   const res = getColorFromTheme();
 
   return res;
+}
+
+export function getChartListColorFromTheme(brandTheme: string): Array<string> {
+  return Color.getRandomPalette({
+    color: brandTheme,
+    colorGamut: 'bright',
+    number: 8,
+  });
+}
+
+export function getTdColor(): any {
+  const style = getComputedStyle(document.documentElement);
+  const bgColorPage = trim(style.getPropertyValue('--td-bg-color-page'));
+  const bgColorContainer = trim(style.getPropertyValue('--td-bg-color-container'));
+  const componentBorder = trim(style.getPropertyValue('--td-component-border'));
+  const textColor = trim(style.getPropertyValue('--td-text-color-primary'));
+
+  return {
+    bgColorPage,
+    bgColorContainer,
+    componentBorder,
+    textColor,
+  };
 }
 
 /**
