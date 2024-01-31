@@ -25,7 +25,7 @@ export const USER_INFO_LIST: Array<UserInfoListType> = [
   },
   {
     title: t('pages.user.personalInfo.desc.entity'),
-    content: '腾讯集团',
+    content: '紫讯集团',
   },
   {
     title: t('pages.user.personalInfo.desc.leader'),
@@ -41,7 +41,7 @@ export const USER_INFO_LIST: Array<UserInfoListType> = [
   },
   {
     title: t('pages.user.personalInfo.desc.group'),
-    content: '腾讯/腾讯公司/某事业群/某产品部/某运营中心/商户服务组',
+    content: '紫讯/紫讯公司/某事业群/某产品部/某运营中心/商户服务组',
     span: 6,
   },
 ];

@@ -81,7 +81,7 @@ const BASE_INFO_DATA = [
   },
   {
     name: t('constants.contract.company'),
-    value: '腾讯科技（深圳）有限公司',
+    value: '紫讯科技（深圳）有限公司',
     type: null,
   },
   {

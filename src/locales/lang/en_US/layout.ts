@@ -1,6 +1,7 @@
 export default {
   header: {
     code: 'Code Repository',
+    component: 'Component',
     help: 'Document',
     user: 'Profile',
     signOut: 'Sign Out',

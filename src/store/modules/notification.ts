@@ -5,7 +5,7 @@ import type { NotificationItem } from '@/types/interface';
 const msgData = [
   {
     id: '123',
-    content: '腾讯大厦一楼改造施工项目 已通过审核！',
+    content: '紫讯大厦一楼改造施工项目 已通过审核！',
     type: '合同动态',
     status: true,
     collected: false,

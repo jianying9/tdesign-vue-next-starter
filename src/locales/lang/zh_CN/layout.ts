@@ -1,6 +1,7 @@
 export default {
   header: {
     code: '代码仓库',
+    component: '组件',
     help: '帮助文档',
     user: '个人中心',
     signOut: '退出登录',
