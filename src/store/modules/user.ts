@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME } from '@/config/global';
 import { usePermissionStore } from '@/store';
 import type { UserInfo } from '@/types/interface';
 
@@ -10,7 +11,7 @@ const InitUserInfo: UserInfo = {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    token: 'main_token', // 默认token不走权限
+    token: localStorage.getItem(ACCESS_TOKEN_NAME) || '', // 默认token不走权限
     userInfo: { ...InitUserInfo },
   }),
   getters: {
@@ -54,11 +55,23 @@ export const useUserStore = defineStore('user', {
         throw res;
       }
     },
+    async initUserPermission() {
+      this.userInfo.roles = [];
+      const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME) || '';
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN_NAME) || '';
+      if (accessToken !== '' && refreshToken !== '') {
+        const userVo = this.getUserInfo();
+        this.userInfo.name = userVo.name;
+        this.userInfo.roles = userVo.roleArray;
+      }
+      const permissionStore = usePermissionStore();
+      permissionStore.initRoutes(this.userInfo.roles);
+    },
     async getUserInfo() {
       const mockRemoteUserInfo = async (token: string) => {
         if (token === 'main_token') {
           return {
-            name: 'Tencent',
+            name: 'Zixun',
             roles: ['all'], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
           };
         }
@@ -72,14 +85,14 @@ export const useUserStore = defineStore('user', {
       this.userInfo = res;
     },
     async logout() {
+      localStorage.removeItem(ACCESS_TOKEN_NAME);
       this.token = '';
       this.userInfo = { ...InitUserInfo };
     },
   },
   persist: {
-    afterRestore: () => {
-      const permissionStore = usePermissionStore();
-      permissionStore.initRoutes();
+    afterRestore: async (ctx) => {
+      await ctx.store.initUserPermission();
     },
     key: 'user',
     paths: ['token'],
