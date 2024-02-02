@@ -8,7 +8,7 @@
       </template>
       <menu-content :nav-data="menu" />
       <template #operations>
-        <span class="version-container"> {{ !collapsed ? 'TDesign Starter' : '' }} {{ pgk.version }} </span>
+        <!-- <span class="version-container"> {{ !collapsed ? 'TDesign Starter' : '' }} {{ pgk.version }} </span> -->
       </template>
     </t-menu>
     <div :class="`${prefix}-side-nav-placeholder${collapsed ? '-hidden' : ''}`"></div>
@@ -28,7 +28,6 @@ import { getActive, getRoutesExpanded } from '@/router';
 import { useSettingStore } from '@/store';
 import type { MenuRoute } from '@/types/interface';
 
-import pgk from '../../../package.json';
 import MenuContent from './MenuContent.vue';
 
 const MIN_POINT = 992 - 1;
