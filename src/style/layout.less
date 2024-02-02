@@ -52,6 +52,10 @@
   background: var(--td-gray-color-13);
 }
 
+.t-loading__overlay {
+    background-color: rgb(0 0 0 / 0%);
+}
+
 .@{starter-prefix} {
   // 布局元素调整
   &-wrapper {
@@ -151,7 +155,7 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-
+      fill: var(--td-brand-color);
       &:hover {
         cursor: pointer;
       }
@@ -167,6 +171,7 @@
       height: var(--td-comp-size-s);
       width: 100%;
       color: var(--td-text-color-primary);
+      fill: var(--td-brand-color);
     }
 
     &-logo-normal {
@@ -213,3 +218,131 @@
 .container-base-margin-top {
   margin-top: 16px;
 }
+
+.common-card {
+  padding: 8px;
+
+  // :deep(.t-card__header) {
+  //   padding-bottom: 8px;
+  // }
+
+  // :deep(.t-card__title) {
+  //   font-size: 20px;
+  //   font-weight: 500;
+  // }
+
+  // :deep(.t-list__inner) {
+  //   max-height: 600px;
+  //   overflow: hidden auto;
+  // }
+}
+
+.fixed-height-card {
+  padding: 8px;
+
+  .t-card__body {
+    min-height: 690px;
+    max-height: 690px;
+    overflow: hidden auto;
+  }
+
+  .t-card__body::-webkit-scrollbar {
+      /* 隐藏默认的滚动条 */
+      -webkit-appearance: none;
+  }
+
+  .t-card__body::-webkit-scrollbar:vertical {
+      /* 设置垂直滚动条宽度 */
+      width: 3px;
+  }
+
+  .t-card__body::-webkit-scrollbar:horizontal{
+      /* 设置水平滚动条厚度 */
+      height: 3px;
+  }
+
+  .t-card__body::-webkit-scrollbar-thumb {
+      /* 滚动条的其他样式定制，注意，这个一定也要定制，否则就是一个透明的滚动条 */
+      border-radius: 8px;
+      border: 3px solid var(--td-component-border);
+  }
+
+}
+
+.common-row-container:not(:last-child) {
+  margin-bottom: 16px;
+}
+
+#nprogress {
+  .bar {
+    background: var(--td-brand-color);
+  }
+
+  .peg {
+    background: var(--td-brand-color);
+    box-shadow: 0 0 10px var(--td-brand-color), 0 0 5px var(--td-brand-color);
+  }
+}
+
+.form-basic-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--td-bg-color-container);
+  border-radius: var(--td-radius-medium) var(--td-radius-medium) 0 0;
+  padding: var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xl) var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xl);
+
+  @media (max-width: @screen-sm-max) {
+    padding: var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xl) var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xl);
+
+    .form-basic-container-title {
+      margin: 0 0 var(--td-comp-margin-xxxl) 0;
+    }
+  }
+
+  .form-basic-item {
+    width: 676px;
+
+    .form-basic-container-title {
+      font: var(--td-font-title-large);
+      font-weight: 400;
+      color: var(--td-text-color-primary);
+      margin: var(--td-comp-margin-xl) 0 var(--td-comp-margin-xl) 0;
+    }
+
+    .form-title-gap {
+      margin: calc(var(--td-comp-margin-xl) * 2) 0 var(--td-comp-margin-xl) 0;
+    }
+  }
+}
+
+.form-submit-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: var(--td-comp-paddingLR-xl);
+  padding-bottom: var(--td-comp-paddingLR-xl);
+  background-color: var(--td-bg-color-secondarycontainer);
+  border-bottom-left-radius: var(--td-radius-medium);
+  border-bottom-right-radius: var(--td-radius-medium);
+  border-top: 1px solid var(--td-component-stroke);
+
+  .form-submit-sub {
+    width: 676px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .form-submit-left {
+      .form-submit-upload-span {
+        font-size: 14px;
+        line-height: 22px;
+        color: var(--td-text-color-placeholder);
+        padding-top: 8px;
+        display: inline-block;
+      }
+    }
+  }
+}
+
