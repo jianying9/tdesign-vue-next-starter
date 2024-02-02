@@ -24,13 +24,15 @@
 </template>
 
 <script setup lang="ts">
+import 'nprogress/nprogress.css'; // progress bar style
 import '@/style/layout.less';
 
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { onBeforeRouteLeave, useRoute } from 'vue-router';
 
 import { prefix } from '@/config/global';
+import { setScrollTopCache } from '@/router';
 import { useSettingStore, useTabsRouterStore } from '@/store';
 
 import LayoutContent from './components/LayoutContent.vue';
@@ -41,6 +43,7 @@ import SettingCom from './setting.vue';
 const route = useRoute();
 const settingStore = useSettingStore();
 const tabsRouterStore = useTabsRouterStore();
+
 const setting = storeToRefs(settingStore);
 
 const mainLayoutCls = computed(() => [
@@ -48,6 +51,11 @@ const mainLayoutCls = computed(() => [
     't-layout--with-sider': settingStore.showSidebar,
   },
 ]);
+
+onBeforeRouteLeave((to, from) => {
+  const top = document.querySelector(`.${prefix}-layout`).scrollTop;
+  setScrollTopCache(from.path, top);
+});
 
 const appendNewRoute = () => {
   const {
@@ -67,7 +75,7 @@ watch(
   () => route.path,
   () => {
     appendNewRoute();
-    document.querySelector(`.${prefix}-layout`).scrollTo({ top: 0, behavior: 'smooth' });
+    // document.querySelector(`.${prefix}-layout`).scrollTo({ top: 0, behavior: 'smooth' });
   },
 );
 </script>
