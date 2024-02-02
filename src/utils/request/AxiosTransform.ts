@@ -1,7 +1,7 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 
-import type { RequestOptions, Result } from '@/types/axios';
+import type { RequestOptions } from '@/types/axios';
 
 /**
  * @description 创建Axios实例配置
@@ -35,12 +35,20 @@ export abstract class AxiosTransform {
   /**
    * 数据处理前钩子
    */
-  transformRequestHook?: <T = any>(res: AxiosResponse<Result>, options: RequestOptions) => T;
+  transformRequestHook?: <T = any>(
+    config: AxiosRequestConfig,
+    res: AxiosResponse<any>,
+    options: RequestOptions,
+  ) => Promise<T>;
 
   /**
    * 请求失败钩子
    */
-  requestCatchHook?: <T = any>(e: Error | AxiosError, options: RequestOptions) => Promise<T>;
+  requestCatchHook?: <T = any>(
+    e: Error | AxiosError,
+    options: RequestOptions,
+    config: AxiosRequestConfig,
+  ) => Promise<T>;
 
   /**
    * 请求拦截器

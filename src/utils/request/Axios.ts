@@ -13,7 +13,7 @@ import throttle from 'lodash/throttle';
 import { stringify } from 'qs';
 
 import { ContentTypeEnum } from '@/constants';
-import { AxiosRequestConfigRetry, RequestOptions, Result } from '@/types/axios';
+import { AxiosRequestConfigRetry, RequestOptions } from '@/types/axios';
 
 import { AxiosCanceler } from './AxiosCancel';
 import { CreateAxiosOptions } from './AxiosTransform';
@@ -265,11 +265,11 @@ export class VAxios {
 
     return new Promise((resolve, reject) => {
       this.instance
-        .request<any, AxiosResponse<Result>>(!config.retryCount ? conf : config)
-        .then((res: AxiosResponse<Result>) => {
+        .request<any, AxiosResponse<T>>(!config.retryCount ? conf : config)
+        .then(async (res: AxiosResponse<T>) => {
           if (transformRequestHook && isFunction(transformRequestHook)) {
             try {
-              const ret = transformRequestHook(res, opt);
+              const ret = await transformRequestHook(config, res, opt);
               resolve(ret);
             } catch (err) {
               reject(err || new Error('请求错误!'));
@@ -280,7 +280,7 @@ export class VAxios {
         })
         .catch((e: Error | AxiosError) => {
           if (requestCatchHook && isFunction(requestCatchHook)) {
-            reject(requestCatchHook(e, opt));
+            reject(requestCatchHook(e, opt, config));
             return;
           }
           if (axios.isAxiosError(e)) {

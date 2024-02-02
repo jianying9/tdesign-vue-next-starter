@@ -1,4 +1,5 @@
 import type { AxiosRequestConfig } from 'axios';
+import { LoadingInstance } from 'tdesign-vue-next';
 
 /**
  * Axios请求配置
@@ -86,11 +87,8 @@ export interface RequestOptions {
   debounce?: {
     delay: number;
   };
-}
-
-export interface Result<T = any> {
-  code: number;
-  data: T;
+  loading?: LoadingInstance;
+  loadingDelay?: Timeout;
 }
 
 export interface AxiosRequestConfigRetry extends AxiosRequestConfig {

@@ -2,9 +2,13 @@
 import type { AxiosInstance } from 'axios';
 import isString from 'lodash/isString';
 import merge from 'lodash/merge';
+import NProgress from 'nprogress'; // progress bar
+import { LoadingPlugin, MessagePlugin } from 'tdesign-vue-next';
 
+import * as tokenApi from '@/api/tokenApi';
+import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME } from '@/config/global';
 import { ContentTypeEnum } from '@/constants';
-import { useUserStore } from '@/store';
+import router from '@/router';
 
 import { VAxios } from './Axios';
 import type { AxiosTransform, CreateAxiosOptions } from './AxiosTransform';
@@ -18,7 +22,7 @@ const host = env === 'mock' || import.meta.env.VITE_IS_REQUEST_PROXY !== 'true' 
 // 数据处理，方便区分多种处理方式
 const transform: AxiosTransform = {
   // 处理请求数据。如果数据不是预期格式，可直接抛出错误
-  transformRequestHook: (res, options) => {
+  transformRequestHook: async (config, res, options) => {
     const { isTransformResponse, isReturnNativeResponse } = options;
 
     // 如果204无内容直接返回
@@ -38,21 +42,49 @@ const transform: AxiosTransform = {
     }
 
     // 错误的时候返回
-    const { data } = res;
+    let { data } = res;
     if (!data) {
       throw new Error('请求接口错误');
     }
 
-    //  这里 code为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
-    const { code } = data;
-
-    // 这里逻辑可以根据项目进行修改
-    const hasSuccess = data && code === 0;
-    if (hasSuccess) {
-      return data.data;
+    if (data.errcode === 402) {
+      // token过期，自动刷新，并重发请求
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN_NAME);
+      if (refreshToken) {
+        const tokenVo = await tokenApi.refreshToken({ refreshToken });
+        localStorage.setItem(ACCESS_TOKEN_NAME, tokenVo.accessToken);
+        data = await request.post(config, options);
+      }
     }
 
-    throw new Error(`请求接口错误, 错误码: ${code}`);
+    NProgress.done();
+    if (options.loadingDelay) {
+      clearTimeout(options.loadingDelay);
+    }
+    if (options.loading) {
+      options.loading.hide();
+    }
+
+    //  这里 code为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
+    if (data.errcode === 401) {
+      // token错误
+      if (router.currentRoute.value.fullPath === '/') {
+        router.push(`/login`);
+      } else {
+        router.push(`/login?redirect=${router.currentRoute.value.fullPath}`);
+      }
+      throw new Error('未登录');
+    }
+
+    // 这里逻辑可以根据项目进行修改
+    const hasSuccess = data && data.errcode === 200;
+    if (hasSuccess) {
+      return data;
+    }
+
+    const text = `请求接口错误:${config.url}, 错误码: ${data.errcode}, 错误信息: ${data.errmsg}`;
+    MessagePlugin.error(text);
+    throw new Error(text);
   },
 
   // 请求前处理配置
@@ -107,15 +139,26 @@ const transform: AxiosTransform = {
       config.url += params;
       config.params = undefined;
     }
+
+    NProgress.start();
+    const timer = setTimeout(() => {
+      if (NProgress.isStarted()) {
+        options.loading = LoadingPlugin({
+          fullscreen: true,
+          attach: 'body',
+          inheritColor: true,
+        });
+      }
+      clearTimeout(timer);
+    }, 600);
+    options.loadingDelay = timer;
     return config;
   },
 
   // 请求拦截器处理
   requestInterceptors: (config, options) => {
     // 请求之前处理config
-    const userStore = useUserStore();
-    const { token } = userStore;
-
+    const token = localStorage.getItem(ACCESS_TOKEN_NAME);
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
       // jwt token
       (config as Recordable).headers.Authorization = options.authenticationScheme
@@ -149,6 +192,21 @@ const transform: AxiosTransform = {
     config.headers = { ...config.headers, 'Content-Type': ContentTypeEnum.Json };
     return backoff.then((config) => instance.request(config));
   },
+  /**
+   * 请求失败钩子
+   */
+  requestCatchHook: (e, options, config) => {
+    NProgress.done();
+    if (options.loadingDelay) {
+      clearTimeout(options.loadingDelay);
+    }
+    if (options.loading) {
+      options.loading.hide();
+    }
+    const text = `请求接口错误:${config.url}, ${e.message}`;
+    MessagePlugin.error(text);
+    throw e;
+  },
 };
 
 function createAxios(opt?: Partial<CreateAxiosOptions>) {
@@ -159,11 +217,13 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         // 例如: authenticationScheme: 'Bearer'
         authenticationScheme: '',
         // 超时
-        timeout: 10 * 1000,
-        // 携带Cookie
-        withCredentials: true,
+        timeout: 10 * 3000,
+        // 携带Cookie 为true时，响应头Access-Control-Allow-Origin不可以设置为*
+        withCredentials: false,
         // 头信息
-        headers: { 'Content-Type': ContentTypeEnum.Json },
+        headers: {
+          'Content-Type': ContentTypeEnum.Json,
+        },
         // 数据处理方式
         transform,
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
@@ -171,7 +231,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           // 接口地址
           apiUrl: host,
           // 是否自动添加接口前缀
-          isJoinPrefix: true,
+          isJoinPrefix: import.meta.env.VITE_API_USE_URL_PREFIX === 'true',
           // 接口前缀
           // 例如: https://www.baidu.com/api
           // urlPrefix: '/api'
@@ -194,7 +254,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           withToken: true,
           // 重试
           retry: {
-            count: 3,
+            count: 0,
             delay: 1000,
           },
         },
