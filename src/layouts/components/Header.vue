@@ -28,6 +28,11 @@
               <t-icon name="logo-github" />
             </t-button>
           </t-tooltip>
+          <t-tooltip placement="bottom" :content="$t('layout.header.component')">
+            <t-button theme="default" shape="square" variant="text" @click="navToComponent">
+              <t-icon name="chart" />
+            </t-button>
+          </t-tooltip>
           <t-tooltip placement="bottom" :content="$t('layout.header.help')">
             <t-button theme="default" shape="square" variant="text" @click="navToHelper">
               <t-icon name="help-circle" />
@@ -176,6 +181,10 @@ const navToGitHub = () => {
   window.open('https://github.com/tencent/tdesign-vue-next-starter');
 };
 
+const navToComponent = () => {
+  window.open('https://tdesign.tencent.com/vue-next/overview');
+};
+
 const navToHelper = () => {
   window.open('http://tdesign.tencent.com/starter/docs/get-started');
 };
@@ -249,6 +258,7 @@ const navToHelper = () => {
   color: var(--td-text-color-primary);
 
   .t-logo {
+    fill: var(--td-brand-color);
     width: 100%;
     height: 100%;
 
