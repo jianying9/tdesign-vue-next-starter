@@ -28,6 +28,8 @@ function filterPermissionsRouters(routes: Array<RouteRecordRaw>, roles: Array<un
       const newRoute = merge({}, route);
       newRoute.children = children;
       res.push(newRoute);
+    } else {
+      removeRoutes.push(route);
     }
   });
 
