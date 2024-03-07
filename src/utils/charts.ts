@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import * as chartModel from '@/api/model/chartModel';
+import { GarphOptionVo, LineOptionVo, PieOptionVo, SunburstOptionVo } from '@/api/model/chartModel';
 import { useSettingStore } from '@/store';
 import { getChartListColorFromTheme, getTdColor } from '@/utils/color';
 
@@ -45,7 +45,7 @@ export function getRandomArray(num = 100): number {
   return resultNum;
 }
 
-export function createAreaLineOption(vo: chartModel.LineOptionVo): any {
+export function createAreaLineOption(vo: LineOptionVo): any {
   const settingStore = useSettingStore();
   const { placeholderColor, borderColor } = settingStore.chartColors;
   const tdColor = getTdColor();
@@ -156,7 +156,7 @@ export function createAreaLineOption(vo: chartModel.LineOptionVo): any {
   return option;
 }
 
-export function createPieOption(vo: chartModel.PieOptionVo): any {
+export function createPieOption(vo: PieOptionVo): any {
   const settingStore = useSettingStore();
   const { placeholderColor, borderColor } = settingStore.chartColors;
   const tdColor = getTdColor();
@@ -280,7 +280,7 @@ function setChildColor(item: any, color: string, total: number): string {
   return color;
 }
 
-export function createSunburstOption(vo: chartModel.SunburstOptionVo): any {
+export function createSunburstOption(vo: SunburstOptionVo): any {
   const settingStore = useSettingStore();
   const { placeholderColor, borderColor } = settingStore.chartColors;
   const tdColor = getTdColor();
@@ -389,7 +389,7 @@ export function createSunburstOption(vo: chartModel.SunburstOptionVo): any {
   return option;
 }
 
-export function createGraphOption(vo: chartModel.GarphOptionVo): any {
+export function createGraphOption(vo: GarphOptionVo): any {
   const settingStore = useSettingStore();
   const { placeholderColor } = settingStore.chartColors;
   const tdColor = getTdColor();
