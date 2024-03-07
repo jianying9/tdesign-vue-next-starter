@@ -280,7 +280,7 @@ function setChildColor(item: any, color: string, total: number): string {
   return color;
 }
 
-export function createSunburstOption(vo: SunburstOptionVo): any {
+export function createSunburstOption(vo: SunburstOptionVo, formatter: string): any {
   const settingStore = useSettingStore();
   const { placeholderColor, borderColor } = settingStore.chartColors;
   const tdColor = getTdColor();
@@ -305,6 +305,14 @@ export function createSunburstOption(vo: SunburstOptionVo): any {
     series: <any>[],
   };
   const { total } = vo;
+  let formatterFunc = (param: any) => {
+    return `${param.name} ${((param.value / total) * 100).toFixed(2)}%`;
+  };
+  if (formatter === 'count') {
+    formatterFunc = (param: any) => {
+      return `${param.name} ${param.value}`;
+    };
+  }
   vo.series.forEach((seriesVo) => {
     const data: any = [];
     seriesVo.data.forEach((dataVo, index) => {
@@ -340,10 +348,7 @@ export function createSunburstOption(vo: SunburstOptionVo): any {
           },
           label: {
             // formatter: ['{b}', '{c}'].join(' '),
-            formatter: (param: any) => {
-              // console.log('level1', param);
-              return `${param.name} ${((param.value / total) * 100).toFixed(2)}%`;
-            },
+            formatter: formatterFunc,
             align: 'right',
           },
         },
@@ -352,10 +357,7 @@ export function createSunburstOption(vo: SunburstOptionVo): any {
           r: '60%',
           label: {
             // formatter: ['{b}', '{c}'].join(' '),
-            formatter: (param: any) => {
-              // console.log('level2', param);
-              return `${param.name} ${((param.value / total) * 100).toFixed(2)}%`;
-            },
+            formatter: formatterFunc,
             align: 'right',
           },
           itemStyle: {
@@ -370,10 +372,7 @@ export function createSunburstOption(vo: SunburstOptionVo): any {
             fontSize: 10,
             color: placeholderColor,
             // formatter: ['{b}', '{c}'].join(' '),
-            formatter: (param: any) => {
-              // console.log('level3', param);
-              return `${param.name} ${((param.value / total) * 100).toFixed(2)}%`;
-            },
+            formatter: formatterFunc,
             position: 'outside',
             silent: false,
           },
