@@ -28,6 +28,10 @@ router.beforeEach(async (to, from, next) => {
         router.addRoute(item);
       });
 
+      if (routeList.length <= 0) {
+        next(`/`);
+      }
+
       if (router.hasRoute(to.name)) {
         next();
       } else {
