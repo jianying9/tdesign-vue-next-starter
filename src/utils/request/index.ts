@@ -167,7 +167,6 @@ const transform: AxiosTransform = {
         ? `${options.authenticationScheme} ${token}`
         : token;
     }
-    console.log(options.requestOptions);
     const { requestOptions } = options;
     if (requestOptions.signSalt) {
       const nonce = nanoid();
