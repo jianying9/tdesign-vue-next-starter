@@ -2,8 +2,10 @@
 import type { AxiosInstance } from 'axios';
 import isString from 'lodash/isString';
 import merge from 'lodash/merge';
+import { nanoid } from 'nanoid';
 import NProgress from 'nprogress'; // progress bar
 import { LoadingPlugin, MessagePlugin } from 'tdesign-vue-next';
+import { Md5 } from 'ts-md5';
 
 import * as tokenApi from '@/api/tokenApi';
 import { ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME } from '@/config/global';
@@ -165,6 +167,16 @@ const transform: AxiosTransform = {
         ? `${options.authenticationScheme} ${token}`
         : token;
     }
+    console.log(options.requestOptions);
+    const { requestOptions } = options;
+    if (requestOptions.signSalt) {
+      const nonce = nanoid();
+      const ts = `${new Date().getTime()}`;
+      const sign = Md5.hashStr(requestOptions.signSalt + ts + nonce);
+      (config as Recordable).headers.nonce = nonce;
+      (config as Recordable).headers.ts = ts;
+      (config as Recordable).headers.sign = sign;
+    }
     return config;
   },
 
@@ -232,6 +244,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
           apiUrl: host,
           // 是否自动添加接口前缀
           isJoinPrefix: import.meta.env.VITE_API_USE_URL_PREFIX === 'true',
+          signSalt: import.meta.env.VITE_API_URL_SIGN_SALT,
           // 接口前缀
           // 例如: https://www.baidu.com/api
           // urlPrefix: '/api'

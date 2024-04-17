@@ -87,6 +87,7 @@ export interface RequestOptions {
   debounce?: {
     delay: number;
   };
+  signSalt: string;
   loading?: LoadingInstance;
   loadingDelay?: Timeout;
 }
