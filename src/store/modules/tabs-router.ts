@@ -38,7 +38,10 @@ export const useTabsRouterStore = defineStore('tabsRouter', {
     appendTabRouterList(newRoute: TRouterInfo) {
       // 不要将判断条件newRoute.meta.keepAlive !== false修改为newRoute.meta.keepAlive，starter默认开启保活，所以meta.keepAlive未定义时也需要进行保活，只有显式说明false才禁用保活。
       const needAlive = !ignoreCacheRoutes.includes(newRoute.name as string) && newRoute.meta?.keepAlive !== false;
-      if (!this.tabRouters.find((route: TRouterInfo) => route.path === newRoute.path)) {
+      const existRoute = this.tabRouters.find((route: TRouterInfo) => route.path === newRoute.path);
+      if (existRoute) {
+        existRoute.query = newRoute.query;
+      } else {
         // eslint-disable-next-line no-param-reassign
         this.tabRouterList = this.tabRouterList.concat({ ...newRoute, isAlive: needAlive });
       }
