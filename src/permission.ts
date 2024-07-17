@@ -8,8 +8,6 @@ import { getPermissionStore, useUserStore } from '@/store';
 NProgress.configure({ showSpinner: false });
 
 router.beforeEach(async (to, from, next) => {
-  NProgress.start();
-
   const permissionStore = getPermissionStore();
   const { whiteListRouters } = permissionStore;
 
@@ -42,19 +40,14 @@ router.beforeEach(async (to, from, next) => {
         path: '/login',
         query: { redirect: encodeURIComponent(to.fullPath) },
       });
-      NProgress.done();
     }
+  } else if (whiteListRouters.indexOf(to.path) !== -1) {
+    next();
   } else {
-    /* white list router */
-    if (whiteListRouters.indexOf(to.path) !== -1) {
-      next();
-    } else {
-      next({
-        path: '/login',
-        query: { redirect: encodeURIComponent(to.fullPath) },
-      });
-    }
-    NProgress.done();
+    next({
+      path: '/login',
+      query: { redirect: encodeURIComponent(to.fullPath) },
+    });
   }
 });
 
@@ -66,5 +59,4 @@ router.afterEach((to) => {
     userStore.logout();
     permissionStore.restoreRoutes();
   }
-  NProgress.done();
 });
