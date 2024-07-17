@@ -57,37 +57,39 @@ export const useUserStore = defineStore('user', {
       }
     },
     async initUserPermission() {
-      const { timestamp } = this.userInfo;
-      if (timestamp === 0 || new Date().getTime() - timestamp > 30000) {
-        this.userInfo.roles = [];
-        const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME) || '';
-        const refreshToken = localStorage.getItem(REFRESH_TOKEN_NAME) || '';
-        if (accessToken !== '' && refreshToken !== '') {
-          const userVo = await this.getUserInfo();
-          this.userInfo.name = userVo.name;
-          this.userInfo.roles = userVo.roleArray;
-          this.userInfo.timestamp = new Date().getTime();
-        }
+      const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME) || '';
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN_NAME) || '';
+      if (accessToken !== '' && refreshToken !== '') {
+        await this.getUserInfo();
       }
+
       const permissionStore = usePermissionStore();
       permissionStore.initRoutes(this.userInfo.roles);
     },
     async getUserInfo() {
+      const { timestamp } = this.userInfo;
+      if (timestamp === 0 || new Date().getTime() - timestamp > 30000) {
+        this.userInfo.roles = [];
+        const res = await this.getRemoteUserInfo(this.token);
+        this.userInfo = res;
+      }
+    },
+    async getRemoteUserInfo(): Promise<UserInfo> {
       const mockRemoteUserInfo = async (token: string) => {
         if (token === 'main_token') {
           return {
             name: 'Zixun',
+            timestamp: 0,
             roles: ['all'], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
           };
         }
         return {
           name: 'td_dev',
+          timestamp: 0,
           roles: ['UserIndex', 'DashboardBase', 'login'], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
         };
       };
-      const res = await mockRemoteUserInfo(this.token);
-
-      this.userInfo = res;
+      return mockRemoteUserInfo(this.token);
     },
     async logout() {
       localStorage.removeItem(ACCESS_TOKEN_NAME);
