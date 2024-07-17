@@ -6,6 +6,7 @@ import type { UserInfo } from '@/types/interface';
 
 const InitUserInfo: UserInfo = {
   name: '', // 用户名，用于展示在页面右上角头像处
+  timestamp: 0,
   roles: [], // 前端权限模型使用 如果使用请配置modules/permission-fe.ts使用
 };
 
@@ -56,13 +57,17 @@ export const useUserStore = defineStore('user', {
       }
     },
     async initUserPermission() {
-      this.userInfo.roles = [];
-      const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME) || '';
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_NAME) || '';
-      if (accessToken !== '' && refreshToken !== '') {
-        const userVo = this.getUserInfo();
-        this.userInfo.name = userVo.name;
-        this.userInfo.roles = userVo.roleArray;
+      const { timestamp } = this.userInfo;
+      if (timestamp === 0 || new Date().getTime() - timestamp > 30000) {
+        this.userInfo.roles = [];
+        const accessToken = localStorage.getItem(ACCESS_TOKEN_NAME) || '';
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN_NAME) || '';
+        if (accessToken !== '' && refreshToken !== '') {
+          const userVo = await this.getUserInfo();
+          this.userInfo.name = userVo.name;
+          this.userInfo.roles = userVo.roleArray;
+          this.userInfo.timestamp = new Date().getTime();
+        }
       }
       const permissionStore = usePermissionStore();
       permissionStore.initRoutes(this.userInfo.roles);
