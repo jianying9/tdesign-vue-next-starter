@@ -1,9 +1,19 @@
 <template>
-  <div
-    :id="id"
-    class="dashboard-chart-container"
-    :style="{ width: '100%', height: `${resizeTime * maxHeight}px` }"
-  ></div>
+  <t-row :gutter="[12, 12]">
+    <t-col :span="12">
+      <div
+        :id="id"
+        class="dashboard-chart-container"
+        :style="{ width: '100%', height: `${resizeTime * maxHeight}px` }"
+      ></div>
+    </t-col>
+    <t-col :span="5"> </t-col>
+    <t-col :span="2">
+      <t-button size="small" variant="dashed" @click="selectAll">全选</t-button>
+      <t-button size="small" variant="dashed" @click="unSelectAll">反选</t-button>
+    </t-col>
+    <t-col :span="5"> </t-col>
+  </t-row>
 </template>
 
 <script setup lang="ts">
@@ -52,8 +62,33 @@ const { id } = props;
 // monitorChart
 let monitorContainer: HTMLElement;
 let monitorChart: echarts.ECharts;
+let option: any = null;
 const renderMonitorChart = async () => {
-  const option = createAreaLineOption(props.data, props.stack);
+  option = createAreaLineOption(props.data, props.stack);
+  monitorChart.setOption(option, true);
+};
+
+const selectAll = async () => {
+  if (option == null) {
+    return;
+  }
+  const { legend } = option;
+  legend.selected = {};
+  for (let i = 0; i < legend.data.length; i++) {
+    legend.selected[legend.data[i]] = true;
+  }
+  monitorChart.setOption(option, true);
+};
+
+const unSelectAll = async () => {
+  if (option == null) {
+    return;
+  }
+  const { legend } = option;
+  legend.selected = {};
+  for (let i = 0; i < legend.data.length; i++) {
+    legend.selected[legend.data[i]] = false;
+  }
   monitorChart.setOption(option, true);
 };
 
