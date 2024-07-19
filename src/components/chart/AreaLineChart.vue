@@ -21,11 +21,13 @@ const props = withDefaults(
   defineProps<{
     id?: string;
     maxHeight?: string;
+    stack?: boolean;
     data: any;
   }>(),
   {
     id: 'areaLineChart',
     maxHeight: '480',
+    stack: true,
     data: () => {
       return {
         legend: {
@@ -51,7 +53,7 @@ const { id } = props;
 let monitorContainer: HTMLElement;
 let monitorChart: echarts.ECharts;
 const renderMonitorChart = async () => {
-  const option = createAreaLineOption(props.data);
+  const option = createAreaLineOption(props.data, props.stack);
   monitorChart.setOption(option, true);
 };
 

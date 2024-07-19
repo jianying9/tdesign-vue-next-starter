@@ -45,7 +45,7 @@ export function getRandomArray(num = 100): number {
   return resultNum;
 }
 
-export function createAreaLineOption(vo: LineOptionVo): any {
+export function createAreaLineOption(vo: LineOptionVo, stack: boolean): any {
   const settingStore = useSettingStore();
   const { placeholderColor, borderColor } = settingStore.chartColors;
   const tdColor = getTdColor();
@@ -131,7 +131,7 @@ export function createAreaLineOption(vo: LineOptionVo): any {
     series: <any>[],
   };
   vo.series.forEach((seriesVo) => {
-    const item = {
+    const item: any = {
       name: seriesVo.name,
       type: 'line',
       smooth: false,
@@ -145,12 +145,14 @@ export function createAreaLineOption(vo: LineOptionVo): any {
       lineStyle: {
         width: 1,
       },
-      areaStyle: {
-        opacity: 0.1,
-      },
-      stack: 'Total',
       data: seriesVo.data,
     };
+    if (stack) {
+      item.areaStyle = {
+        opacity: 0.1,
+      };
+      item.stack = 'Total';
+    }
     option.series.push(item);
   });
   return option;
