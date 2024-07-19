@@ -81,6 +81,18 @@ export function createAreaLineOption(vo: LineOptionVo, stack: boolean): any {
           backgroundColor: placeholderColor,
         },
       },
+      position(point, params, dom, rect, size) {
+        const { contentSize } = size;
+        const cWidth = contentSize[0];
+        const cHeight = contentSize[1];
+        let x = point[0];
+        if (x > cWidth * 3) {
+          x -= cWidth;
+        }
+        let y = point[1];
+        y -= cHeight / 3;
+        return [x, y];
+      },
     },
     grid: {
       left: '0',
